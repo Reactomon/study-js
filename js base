@@ -1,0 +1,61 @@
+
+Prgramming language - Brendan Eich in 1995, Follows standards ECMA-262, Programs you write in JS are called Scripts which are written
+                      in web page's HTML and run automatically when page loads.
+                      
+                    - Initially named as LiveScript later JS, Initially It was supposed to follow the concepts of Java for browese
+                      client side handling, but later It started to follow its own convention ECMAScript.
+                    
+                    How It works 
+                    - Browsers render HTMLs, they have embedded engine to run scripts associated.
+                      Eg: Chrome has V8 engine.
+                          Firefox has SpiderMonkey.
+                          IE- Trident    
+                    
+                    - Engine reads the scripts, and convert to machine codes then after memory allocation happens.
+                    - JS - Add new HTML to the page, change the existing content, modify styles.
+                         - React to user actions, run on mouse clicks, pointer movements, key presses.
+                         - Send requests over the network to remote servers, download and upload files (so-called AJAX and COMET technologies).
+                         - Get and set cookies, ask questions to the visitor, show messages.
+                         - Remember the data on the client-side (“local storage”)
+                     
+                    - JS Restrictions - JavaScript on a webpage may not read/write arbitrary files on the hard disk, 
+                                        copy them or execute programs. It has no direct access to OS system functions.
+                                         
+                                      - Not possible to communicate over tabs, scripts running in one tab are meant for that tab 
+                                        only, like xyz.com in tab can not communicate to scripts open in abc.com.
+                                        
+                     
+    - Client-Server Communication - Web browsers and web servers function together as a client-server system. 
+                                    In computer networking, client-server is a standard method for designing applications 
+                                    where data is kept in central locations (server computers) and efficiently 
+                                    shared with any number of other computers (the clients) on request. 
+                                    All web browsers function as clients that request information from websites (servers). 
+                                    
+                                  - The user specifies a URL in their browser (either from a bookmark or by typing it in)
+                                  - The browser initiates a TCP connection to the web server or server pool (using port 80 by default) 
+                                    via its IP address as published in DNS. 
+                                    As part of this process, the browser also makes DNS lookup requests to convert the URL to an IP address.
+                                    
+                                  - DNS - Browser searches www.google.com.
+                                        - Local/company DNS is checked, whether able to find address.
+                                        - ISP DNS is checked and finds the address.
+                                        - Root DNS is checked and finds the address and sends it browser back, and browser loads that
+                                          address.
+                                  - After the server completes acknowledgment of its side of the TCP connection, 
+                                    the browser sends HTTP requests to the server to retrieve the content.
+                                    
+                                  - After the server replies with content for the page, the browser retrieves 
+                                    it from the HTTP packets and displays it accordingly.
+                                    Content can include embedded URLs for advertising banners or other third-party content, 
+                                    that in turn triggers the browser to issue new TCP connection requests to those locations. 
+                                    The browser may also save temporary information about its connections to local files 
+                                    on the client computer called cookies.
+                          
+                                  - Any errors encountered during the request for the content might be shown as HTTP status lines.
+
+      - Optimizing the websites can be by activating flags from server like - cache-control: public/private/no-cache.
+      
+ - Variable declartion/function deflaration
+
+ - Datatypes - Primitive - Number, Boolean, String, Symbol, Null, Undefined. //Brief on typeof
+             - Collection - Object
