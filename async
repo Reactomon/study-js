@@ -1,0 +1,370 @@
+Asynchronous APIS
+--------------------------------------
+Callbacks - Callbacks are functions registered as a processing of invocation of a function. Instead of having a value return immediately
+            We can do some business logic in callback.
+            
+            console.log("One"); 
+            setTimeout(() => { console.log("Two"); }, 500); 
+            console.log("Three");
+            
+            Callback Hell-->
+            -------------
+            
+            fs.readdir(source, function (err, files) {
+               if (err) {
+                   console.log('Error finding files: ' + err);
+               } else {
+                   files.forEach(function (filename, fileIndex) {
+                       console.log(filename);
+                       gm(source + filename).size(function (err, values) {
+                           if (err) {
+                               console.log('Error identifying file size: ' + err);
+                           } else {
+                               console.log(filename + ' : ' + values);
+                               aspect = (values.width / values.height);
+                               widths.forEach(function (width, widthIndex) {
+                               height = Math.round(width / aspect);
+                               console.log('resizing ' + filename + 'to ' + height + 'x' + height);
+                               this.resize(width, height).write(dest + 'w' + width + '_' + filename, function(err) {
+                                   if (err) console.log('Error writing file: ' + err);
+                               })
+                               }.bind(this));
+                           }
+                       });
+                   });
+               }
+           })
+
+Promises - Promises are more cleaner and better way of dealing with asynchronous calls in script execution.
+           Syntax - new Promise(executor);
+                  - Executor get immediately invoked with resolve and reject. executor is responsible for invoking asynchronous behavior.
+                    It calls resolve for settling a promise or rejects the promise if any error occurs. return value of promise if 
+                    always ignored.
+                    
+           States - Pending, Fulfilled, Rejected.
+        Operation - Pending is initial state, Can be either fulfilled or rejected. When either shall be executed after then its chained by
+                    .then or .catch method respectively.
+        
+                    
+                    (Pending)Promise ---------> Fulfilled --- .then(fulfilled)------> async actions
+                            fulfill                                              |---------------------> 
+                                                                                                        Promise ----> .then/.catch
+                            ----------> Rejected ---- .then(rejection)--------------------------------->
+                             rejected                 .catch(handling)---
+                                                                        |-->  Error Handling
+
+
+         Methods - Promise.all ---->  Promise.all takes an array of iteratables and returns a single promise at the settlement of all
+                                      the promises and rejects with the reason first promise rejects with.
+                                      
+                                      var promise1 = Promise.resolve(3);
+                                      var promise2 = 42;
+                                      var promise3 = new Promise(function(resolve, reject) {
+                                         setTimeout(resolve, 100, 'foo');
+                                      });
+
+                                      Promise.all([promise1, promise2, promise3]).then(function(values) {
+                                         console.log(values);
+                                      });
+                                      
+                                Key - If an empty array is passed an already resoled promise in provided.
+                                    - If all of the passed-in promises fulfill, or are not promises, 
+                                      the promise returned by Promise.all is fulfilled asynchronously.
+                                      
+                                      var promise1 = Promise.resolve(2);
+                                      var promise2 = 1337;
+                                      var promise3 = new Promise((resolve, reject) => {
+                                            setTimeout(() => {
+                                                resolve("Hello soumya");
+                                            }, 1000);
+                                      });
+                                      
+                                      Promise.all([promise1, promise2, promise3]).then(values => {
+                                            console.log(values);
+                                      });
+                                      
+                                    - If no promisable items are there in Promise.all then it will not count for process but still
+                                      Included in the results being parsed.
+                                      
+                       Observations - // this will be counted as if the iterable passed is empty, so it gets fulfilled
+                                      var p = Promise.all([1,2,3]);
+                                      var p2 = Promise.all([1,2,3, Promise.resolve(444)]);
+                                      var p3 = Promise.all([1,2,3, Promise.reject(555)]);
+                                      setTimeout(function() {
+                                                console.log(p);
+                                                console.log(p2);
+                                                console.log(p3);
+                                      });
+
+                                       // logs
+                                       // Promise { <state>: "fulfilled", <value>: Array[3] }
+                                       // Promise { <state>: "fulfilled", <value>: Array[4] }
+                                       // Promise { <state>: "rejected", <reason>: 555 }
+                                       
+                                    - When passed iteratable in Promise.all is empty then Promise works as Synchronous else 
+                                      asynchrnous.
+                                      
+                                    - Promise.all will reject the complete set of iteratable the moment first promise is rejected,
+                                      with the reason of that rejected promise.
+                                      
+                                    - var p1 = new Promise((resolve, reject) => { 
+                                          setTimeout(() => resolve('one'), 1000); 
+                                       }); 
+                                       var p2 = new Promise((resolve, reject) => { 
+                                          setTimeout(() => resolve('two'), 2000); 
+                                       });
+                                       var p3 = new Promise((resolve, reject) => {
+                                          setTimeout(() => resolve('three'), 3000);
+                                       });
+                                       var p4 = new Promise((resolve, reject) => {
+                                          setTimeout(() => resolve('four'), 4000);
+                                       });
+                                       var p5 = new Promise((resolve, reject) => {
+                                          reject(new Error('reject'));
+                                       });
+
+
+                                        // Using .catch:
+                                        Promise.all([p1, p2, p3, p4, p5])
+                                            .then(values => { 
+                                              console.log(values);
+                                        })
+                                        .catch(error => { 
+                                           console.log(error.message)
+                                         });
+                                         
+                                       Note ----> Resolves only after fulfilling all the settlabled/resolvable promise.
+                                       
+                 - Promise.race() -->  returns a promise that fulfills or rejects as soon as one of the promises in an iterable fulfills or rejects, 
+                                       with the value or reason from that promise            
+                                       
+                                         -  var promise1 = new Promise(function(resolve, reject) {
+                                            setTimeout(resolve, 500, 'one');
+                                            });
+
+                                            var promise2 = new Promise(function(resolve, reject) {
+                                            setTimeout(resolve, 100, 'two');
+                                            });
+
+                                            Promise.race([promise1, promise2]).then(function(value) {
+                                            console.log(value);
+                                            // Both resolve, but promise2 is faster
+                                            });
+                                            // expected output: "two"
+                                        
+                                       Note --> If the iterable passed is empty, the promise returned will be forever pending.
+                                       
+                                            --> If non promisable values are contained then race resolves first from iteratable.
+                                            
+                                            ---> Below example p3 succeeds and p4 since p4 is faster
+                                            
+                                            var p3 = new Promise(function(resolve, reject) { 
+                                                setTimeout(() => resolve('three'), 100);
+                                            });
+                                            var p4 = new Promise(function(resolve, reject) { 
+                                                setTimeout(() => reject(new Error('four')), 500); 
+                                            });
+
+                                            Promise.race([p3, p4])
+                                            .then(function(value) {
+                                              console.log(value); // "three"
+                                              // p3 is faster, so it fulfills
+                                            }, function(reason) {
+                                              // Not called
+                                            });
+                                            
+                                           --> Finally -- Finally means to execute a function callback if a promise is selected or 
+                                           rejected. This will execute in either case no matter what is outcome. This takes no argument
+                                           coz you can't predict the outcome.
+                                           
+               Async/Await ---> Exactly how promises are structured way of writing the callbacks, Async/Await is the cleaner way
+                                to write combination of Generators and Promises.
+                                
+                                Async/Await makes a asynchronous code look and work like synchronous code. Its is built on the top
+                                of promises. Just like promises, async/await works on Non blocking model of JS.
+                                
+                                async function evenNumber(){
+                                  return Promise.resolve(8);
+                                }
+                                
+                        await - makes the code execution to wait until the promises are resolved. Meanwhile it is waiting JS engines
+                                carries on performing tasks like executing scripts and handling event hence no CPU resource shall be 
+                                lost.
+                                
+                                async function even(){
+                                   let promise = new Promise(function(resolve, reject){
+                                       setTimeout(() => resolve(8), 1000);
+                                   });
+                                   
+                                   let result = await promise;
+                                   console.log(result);
+                                }
+                                
+                              - Better Error Handling --> try block can't handle error falling from inside promise as in below ex.
+                              -----------------------
+                                const oldRequest = () => {
+                                  try{
+                                     getData()
+                                            .then(result => {
+                                                  console.log(JSON.parse(result);
+                                            })
+                                            .catch(e){
+                                                  console.log(e);
+                                            }
+                                  }
+                                  catch(e){
+                                      console.log(e);
+                                  }
+                                }
+                                
+                                -- better way to write is with async/await
+                                 
+                                 const oldRequest = async () => {
+                                     try {
+                                         const res = JSON.parse(await getData());
+                                         console.log(res);
+                                     }
+                                     catch(e){
+                                         console.log(e);
+                                     }
+                                 }
+                           
+                                - Better Chaining --> Better handling of nes
+                                -----------------
+                                 function getAPIData(url) {
+                                       return contentData(url) // returns a promise
+                                         .catch(e => {
+                                           return somethingElse(url)  // returns a promise
+                                         })
+                                         .then(v => {
+                                           return someOtherThing(v); // returns a promise
+                                         })
+                                         .then(x => {
+                                           return anotherOtherThing(v)
+                                         });
+                                         //   the chain continues with more .then() handlers
+                                    }
+                                
+                                 -- above function can be written in a better format like below: 
+                                 
+                                  async function getAPIData(url) {
+                                       let payload;
+                                       try {
+                                         const v = await contentData(url);
+                                         payload = await anotherOtherThing(v)
+                                       } catch(e) {
+                                         v = await somethingElse(url);
+                                       }
+                                       return payload;
+                                  }
+                                  
+                                  This is an extension of the error reporting function above however with more 
+                                  attention to performance and memory efficiency.
+                                  Imagine a scenario where a function doe is called when a call to an asynchronous function boo resolves:
+
+                                     const foo = () => {
+                                             boo().then(() => doe());
+                                     };
+                                 When foo is called, the following happens synchronously:
+
+                                 boo is called and returns a promise that will resolve at some point in the future.
+                                 The .then callback (which is effectively calling doe()) is added to the callback chain.
+                                 After that, we’re done executing the code in the body of function foo.
+                                 Note: foo is never suspended, and the context is gone by the time the asynchronous call to boo resolves. 
+                                 Imagine what happens if boo (or doe) asynchronously throws an exception. 
+                                 The stack trace should include foo, since that’s where boo (or doe) was called from, right?
+                                 How is that possible now that we have no reference to foo anymore? That’s exactly the same case we had on the third step above.
+
+                                 To make it work, the JavaScript engine needs to do something in addition to the above steps,
+                                 it also captures and stores the stack trace within foo while it still has the chance.
+                                 Capturing the stack trace takes time (i.e. degrades performance); storing these stack traces requires memory.
+
+                                 Here’s the same program, written using async/await instead of vanilla promises:
+
+                                                const foo = async () => {
+                                                        await boo();
+                                                        doe();
+                                                };
+                                 With await, there’s no need to store the current stack trace — 
+                                 it’s sufficient to store a pointer from boo to foo. 
+                                 During the execution of boo, foo is suspended, so its context is still available. 
+                                 If boo throws an exception, the stack trace can be reconstructed on-demand by traversing these pointers.
+                                 If doe throws an exception, the stack trace can be constructed just like it would be for asynchronous function, 
+                                 because we’re still within foo when that happens. 
+                                 Either way, stack trace capturing is no longer necessary — instead, the stack trace is only constructed when needed. 
+                                 Storing the pointers requires less memory than storing entire stack traces
+
+
+              Time Optiization - function resolveAfter2Seconds(x) {
+                                     return new Promise(resolve => {
+                                         setTimeout(() => {
+                                             resolve(x);
+                                         }, 2000);
+                                     });
+                                 }
+
+
+                                 async function add1(x) {
+                                     const a = await resolveAfter2Seconds(20);
+                                     const b = await resolveAfter2Seconds(30);
+                                     return x + a + b;
+                                 }
+
+                                 add1(10).then(v => {
+                                     console.log(v); // prints 60 after 4 seconds.
+                                 });
+
+
+                                 async function add2(x) {
+                                     const p_a = resolveAfter2Seconds(20);
+                                     const p_b = resolveAfter2Seconds(30);
+                                     return x + await p_a + await p_b;
+                                 }
+
+                                 add2(10).then(v => {
+                                     console.log(v); // prints 60 after 2 seconds.
+                                 });
+                                 
+                                 
+                                 --- Time/Space Optimization Async/Await
+                                 
+                                 const greeting = () => {
+                                                return new Promise((resolve, reject) => {
+                                                            setTimeout(() => {
+                                                                        resolve("Welcome");
+                                                            }, 1000);
+                                                });
+                                    }
+
+                                    const names = () => {
+                                                return new Promise((resolve, reject) => {
+                                                            setTimeout(() => {
+                                                                        resolve("soumya");
+                                                            }, 1000);
+                                                });
+                                    }
+
+                                    const status = () => {
+                                                return new Promise((resolve, reject) => {
+                                                            setTimeout(() => {
+                                                                        resolve("to the town");
+                                                            }, 1000);
+                                                });
+                                    }
+
+                                    const getPromises = async () => {
+
+                                                const a = await greeting();
+                                                const b = await names();
+                                                const c = await status();
+
+                                                console.log(`${a} ${b} ${c}`);
+
+                                    }
+                                    
+                                    --- execute the same in one second
+                                    
+                                    const getPromises1 = async () => {
+                                    const [a, b, c] = await Promise.all([greeting(), names(), status()]);
+                                    console.log(`${a} ${b} ${c}`);
+}
