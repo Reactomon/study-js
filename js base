@@ -59,3 +59,21 @@ Prgramming language - Brendan Eich in 1995, Follows standards ECMA-262, Programs
 
  - Datatypes - Primitive - Number, Boolean, String, Symbol, Null, Undefined. //Brief on typeof
              - Collection - Object
+             
+             Functions are first class first class functions in JS, respected the most and can be used as class with specifying methods, models
+inside it either directly or prototype.
+
+Criteria - return, naming convention, arguments
+
+When a Function Declaration is made within a code block, it is visible everywhere inside that block. But not outside of it.
+
+function abc (){
+  return "somename";
+}
+
+function clearance(){
+				var node = document.createElement("LI");                 // Create a <li> node
+				var textnode = document.createTextNode("Water");         // Create a text node
+				node.appendChild(textnode);                              // Append the text to <li>
+				document.body.appendChild(node); 
+}
